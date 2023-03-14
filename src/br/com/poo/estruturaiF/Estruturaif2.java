@@ -1,5 +1,6 @@
 package br.com.poo.estruturaiF;
 
+import java.util.Scanner;
 
 /*
  * Este programa calcula as notas dos alunos e obtem a média de
