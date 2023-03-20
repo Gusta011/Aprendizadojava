@@ -17,6 +17,10 @@ import javax.swing.JSeparator;
 import javax.swing.JButton;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Padaria extends JFrame {
 
@@ -28,6 +32,11 @@ public class Padaria extends JFrame {
 	private JTextField txtQuantidade;
 	private JTextField txtTotalItem;
 	private JTextField txtSubTotal;
+	private JTextArea txtNota;
+	private String cabecalho;
+	private int item;
+	private double valorPagar;
+	private JLabel lblValorPagar;
 
 	/**
 	 * Launch the application.
@@ -50,6 +59,24 @@ public class Padaria extends JFrame {
 	 */
 	public Padaria() {
 		
+		valorPagar = 0.0;
+		
+		item = 1;
+		
+		cabecalho = "\t\t\t                         GRAN PÃO\n"+
+					"\n\t\t\t Av. Matuí de Franja, 777 - Vista Alegre"+
+					"\n\t\t\t  CEP: 10280-160 - Belo Vertical - MG"+
+					"\n CNPJ: 10.672.072/0001-14"+
+					"\n IE: 152.922671.0009"+
+					"\n IM: 1.025.783/001-1"+
+					"\n----------------------------------------------------------------------------------"
+					+ "--------------------------------------------------------------------------------------------------------------\n"+
+					"\n\t\t\t                     CUPOM FISCAL"+
+					"\n Item\tCódigo\t\tDescrição\t\tQTD\tVL.UNIT.\tVL.TOTAL"+
+					
+					"\n----------------------------------------------------------------------------------"
+					+ "--------------------------------------------------------------------------------------------------------------\n";
+					
 		String[][] produtos = {
 				
 				{"2023","Pão Francês","13.00","17032023"},
@@ -191,7 +218,22 @@ public class Padaria extends JFrame {
 		pnlEsquerdo.add(lblQuantidade);
 		
 		txtQuantidade = new JTextField();
-		txtQuantidade.setText("1,000 =");
+		txtQuantidade.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				
+				txtTotalItem.setText(""+
+						Double.parseDouble(txtQuantidade.getText())*
+						Double.parseDouble(txtValorUnitario.getText())
+						);
+				
+				txtSubTotal.setText("R$"+
+						Double.parseDouble(txtQuantidade.getText())*
+						Double.parseDouble(txtValorUnitario.getText())
+						);
+				
+			}
+		});
 		txtQuantidade.setHorizontalAlignment(SwingConstants.RIGHT);
 		txtQuantidade.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		txtQuantidade.setForeground(Color.WHITE);
@@ -240,6 +282,23 @@ public class Padaria extends JFrame {
 		txtSubTotal.setBorder(null);
 		
 		JButton btnIncluir = new JButton("Incluir");
+		btnIncluir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				cabecalho+="\n"+item+"\t"+txtCodigoProduto.getText()+
+						"\t\t"+txtDescricao.getText()+
+						"\t\t"+txtQuantidade.getText()+
+						"\t"+txtValorUnitario.getText()+
+						"\t"+txtTotalItem.getText();
+				
+				txtNota.setText(cabecalho);
+				item++;
+				
+				valorPagar += Double.parseDouble(txtTotalItem.getText());
+				lblValorPagar.setText("R$ "+valorPagar);
+				
+			}
+		});
 		btnIncluir.setIcon(new ImageIcon(Padaria.class.getResource("/br/com/poo/images/Botao1.png")));
 		btnIncluir.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnIncluir.setBounds(509, 612, 248, 77);
@@ -273,10 +332,31 @@ public class Padaria extends JFrame {
 		pnlDireito.setBackground(new Color(192, 192, 192));
 		pnlDireito.setBounds(810, 0, 774, 700);
 		contentPane.add(pnlDireito);
+		pnlDireito.setLayout(null);
 		
-		JPanel pnlBaixo = new JPanel();
-		pnlBaixo.setBackground(SystemColor.activeCaption);
-		pnlBaixo.setBounds(0, 710, 1584, 150);
-		contentPane.add(pnlBaixo);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(0, 0, 774, 700);
+		pnlDireito.add(scrollPane);
+		
+		txtNota = new JTextArea();
+		scrollPane.setViewportView(txtNota);
+		txtNota.setText(cabecalho);
+		
+		JPanel pnlBase = new JPanel();
+		pnlBase.setBackground(SystemColor.activeCaption);
+		pnlBase.setBounds(0, 710, 1584, 150);
+		contentPane.add(pnlBase);
+		pnlBase.setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Valor a Pagar:");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		lblNewLabel.setBounds(959, 25, 254, 93);
+		pnlBase.add(lblNewLabel);
+		
+		lblValorPagar = new JLabel("New label");
+		lblValorPagar.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		lblValorPagar.setBounds(1223, 25, 351, 93);
+		pnlBase.add(lblValorPagar);
+		lblValorPagar.setText("R$ "+valorPagar);
 	}
 }
